@@ -55,6 +55,17 @@ void decrypt(const unsigned char *cipherText, int len, unsigned char * key, unsi
     }
 }
 
+string readFromFile(string filename){
+    ifstream myfile(filename);
+    if (!myfile.is_open())
+    {
+        cout << "Unable to open file " << filename << "\n"; 
+        exit(EXIT_FAILURE);
+    }
+    string fileInput((istreambuf_iterator<char>(myfile)),istreambuf_iterator<char>());
+    return fileInput;
+}
+
 int writeToFile(string filename, char* data, int dataLen){
     string outputFileName = filename.substr(0,filename.length()-6);
 
@@ -85,12 +96,9 @@ int main(int argc, char * argv[])
         port = getPort(argc, argv);
     }
 
-    ifstream myfile(filename);
-    if (!myfile.is_open())
-    {
-        cout << "Unable to open file " << filename << "\n"; 
-        exit(EXIT_FAILURE);
-    }
+    string data = readFromFile(filename);
+    const unsigned char* cipherText = (const unsigned char*) data.c_str();
+    int cipherTextLen = data.length();
 
     string password;
     cout << "Password:";
@@ -125,11 +133,6 @@ int main(int argc, char * argv[])
         cout<<hex<<(int)iv[i]<<" ";
     }
     cout << "\n";
-    
-    string fileInput((istreambuf_iterator<char>(myfile)),istreambuf_iterator<char>());
-    const unsigned char* cipherText = (const unsigned char*)fileInput.c_str();
-    int cipherTextLen = fileInput.length();
-    myfile.close();
 
     unsigned char* decryptedText=(unsigned char*)malloc(cipherTextLen);
     int decryptedTextLen;

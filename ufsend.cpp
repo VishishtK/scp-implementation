@@ -59,6 +59,17 @@ int encrypt(const unsigned char *plainText, int len, unsigned char * key, unsign
     return 1;
 }
 
+string readFromFile(string filename){
+    ifstream myfile(filename);
+    if (!myfile.is_open())
+    {
+        cout << "Unable to open file " << filename << "\n"; 
+        exit(EXIT_FAILURE);
+    }
+    string fileInput((istreambuf_iterator<char>(myfile)),istreambuf_iterator<char>());
+    return fileInput;
+}
+
 int writeToFile(string filename, char* data, int dataLen){
     string fileExtension = ".ufsec";
     string outputFileName = filename +fileExtension;
@@ -90,12 +101,9 @@ int main(int argc, char * argv[])
         string ipAddress = getIPAddress(argc, argv);
     }
 
-    ifstream myfile(filename);
-    if (!myfile.is_open())
-    {
-        cout << "Unable to open file " << filename << "\n"; 
-        exit(EXIT_FAILURE);
-    }
+    string data = readFromFile(filename);
+    const unsigned char* plainText = (const unsigned char*) data.c_str();
+    int plainTextLen = data.length();
 
     string password;
     cout << "Password:";
@@ -130,11 +138,6 @@ int main(int argc, char * argv[])
         cout<<hex<<(int)iv[i]<<" ";
     }
     cout << "\n";
-    
-    string fileInput((istreambuf_iterator<char>(myfile)),istreambuf_iterator<char>());
-    const unsigned char* plainText = (const unsigned char*)fileInput.c_str();
-    int plainTextLen = fileInput.length();
-    myfile.close();
 
     unsigned char* cipherText=(unsigned char*)malloc(plainTextLen);
     int cipherTextLen;
@@ -142,7 +145,9 @@ int main(int argc, char * argv[])
         return 0;
     }
     if(runningMode.compare("local")==0){
-        writeToFile(filename,(char *)cipherText,plainTextLen);
+        if(writeToFile(filename,(char *)cipherText,plainTextLen)==33){
+            return 33;
+        }
     }
 
     cout << "Successfully encrypted testfile to testfile.uf ("<<(int)plainTextLen<<" bytes written)\n";

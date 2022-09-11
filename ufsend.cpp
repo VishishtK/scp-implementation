@@ -60,7 +60,7 @@ int encrypt(const unsigned char *plainText, int len, unsigned char * key, unsign
 }
 
 int writeToFile(string filename, char* data, int dataLen){
-    string fileExtension = "ufsec";
+    string fileExtension = ".ufsec";
     string outputFileName = filename +fileExtension;
 
     ifstream myfile(outputFileName);
@@ -144,7 +144,7 @@ int main(int argc, char * argv[])
     if(runningMode.compare("local")==0){
         writeToFile(filename,(char *)cipherText,plainTextLen);
     }
-    
+
     cout << "Successfully encrypted testfile to testfile.uf ("<<(int)plainTextLen<<" bytes written)\n";
     for(int i=0;i<10;i++){
         cout<<hex<<(int)cipherText[i]<<" ";

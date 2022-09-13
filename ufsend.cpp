@@ -107,16 +107,15 @@ void sendData(string ipAddress, unsigned char* cipherText, int cipherTextLen){
 
     int fd;
     fd = socket(AF_INET, SOCK_STREAM, 0);
-    cout<<fd<<"\n";
 
     struct sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_port = htons(stoi(port));
     int address_length = sizeof(address);
 
-    cout<<inet_pton(AF_INET, ip.c_str(),&address.sin_addr)<<"\n";
+    inet_pton(AF_INET, ip.c_str(),&address.sin_addr)<<"\n";
 
-    cout<<connect(fd, (struct sockaddr*)&address,address_length)<<"\n";
+    connect(fd, (struct sockaddr*)&address,address_length)<<"\n";
 
     cout << "Sending encrypted data \n";
 
@@ -132,7 +131,6 @@ void sendData(string ipAddress, unsigned char* cipherText, int cipherTextLen){
         }else{
             bytesSent = bytesSent + send(fd,cipherText+bytesSent,cipherTextLen-bytesSent,0);
         }
-        cout<<bytesSent<<"\n";
     }
     return;
 }

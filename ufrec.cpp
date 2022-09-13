@@ -6,6 +6,9 @@
 #include <openssl/ssl.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <netinet/in.h>
 using namespace std;
 
 string getFilename(int argc, char * argv[]){
@@ -87,6 +90,46 @@ int writeToFile(string filename, char* data, int dataLen){
     return 1;
 }
 
+void recieveData(string port, unsigned char ** cipherText, int* cipherTextLen){
+    int fd;
+
+    fd = socket(AF_INET,SOCK_STREAM,0);
+    cout<<fd<<"\n";
+
+    struct sockaddr_in address;
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(stoi(port));
+    int address_length = sizeof(address);
+
+    bind(fd, (struct sockaddr*)&address,sizeof(address));
+
+    cout << listen(fd,3)<<"\n";
+
+    int socket = accept(fd,(struct sockaddr *)&address, (socklen_t*)&address_length);
+    cout<<socket<<"\n";
+
+    int bytesRead = 0;
+    int totalBytes;
+    while(bytesRead<4){
+        bytesRead = bytesRead + read(socket, &totalBytes, 4);
+    }
+
+    bytesRead = 1;
+    int totalBytesRead=0;
+    unsigned char buffer[totalBytes];
+    cout<< "Total Bytes:" << totalBytes<<"\n";
+    cout << "Printing recieved data \n";
+
+    while(bytesRead!=0){
+        bytesRead = recv(socket, buffer+totalBytesRead, totalBytes,0);
+        totalBytesRead = totalBytesRead + bytesRead;
+    }
+    *cipherText = buffer;
+    *cipherTextLen = totalBytes;
+    return;
+}
+
 int main(int argc, char * argv[])
 {    
     string filename = getFilename(argc, argv);
@@ -96,9 +139,20 @@ int main(int argc, char * argv[])
         port = getPort(argc, argv);
     }
 
-    string data = readFromFile(filename);
-    const unsigned char* cipherText = (const unsigned char*) data.c_str();
-    int cipherTextLen = data.length();
+    unsigned char* cipherText=NULL;
+    int cipherTextLen;
+    string data;
+    if(runningMode.compare("local")==0){
+        data = readFromFile(filename);
+        cipherText = (unsigned char*) data.c_str();
+        cipherTextLen = data.length();
+        
+    }else{
+        recieveData(port,&cipherText,&cipherTextLen);
+        cout<<"DATA:" << cipherText<<"\n";
+        cout<<"DATALEN:" << cipherTextLen<<"\n";
+    }
+
 
     string password;
     cout << "Password:";
@@ -120,7 +174,7 @@ int main(int argc, char * argv[])
     }
     cout << "KEY: ";
     for(int i=0;i<keyLength;i++){
-        cout<<hex<<(int)key[i]<<" ";
+        cout<<hex<<(int)key[i]<<" "<<dec;
     }
     cout << "\n";
 
@@ -130,7 +184,7 @@ int main(int argc, char * argv[])
     }
     cout << "IV: ";
     for(int i=0;i<ivLength;i++){
-        cout<<hex<<(int)iv[i]<<" ";
+        cout<<hex<<(int)iv[i]<<" "<<dec;
     }
     cout << "\n";
 
@@ -138,5 +192,6 @@ int main(int argc, char * argv[])
     int decryptedTextLen;
 
     decrypt((const unsigned char*)cipherText,cipherTextLen,key,iv,aes256,decryptedText,&decryptedTextLen);
+    cout<<decryptedText;
     return writeToFile(filename,(char *)decryptedText,decryptedTextLen);
 }

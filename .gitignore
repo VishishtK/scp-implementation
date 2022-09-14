@@ -1,1 +1,4 @@
 test.txt.ufsec
+*.o
+ufrec
+ufsend

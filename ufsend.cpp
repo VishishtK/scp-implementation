@@ -113,9 +113,9 @@ void sendData(string ipAddress, unsigned char* cipherText, int cipherTextLen){
     address.sin_port = htons(stoi(port));
     int address_length = sizeof(address);
 
-    inet_pton(AF_INET, ip.c_str(),&address.sin_addr)<<"\n";
+    inet_pton(AF_INET, ip.c_str(),&address.sin_addr);
 
-    connect(fd, (struct sockaddr*)&address,address_length)<<"\n";
+    connect(fd, (struct sockaddr*)&address,address_length);
 
     cout << "Sending encrypted data \n";
 

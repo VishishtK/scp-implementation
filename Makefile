@@ -14,3 +14,6 @@ ufrec.o: ufrec.cpp
 
 clean: 
 	rm -f *.o
+	rm -f ufsend
+	rm -f ufrec
+	rm -f *.ufsec

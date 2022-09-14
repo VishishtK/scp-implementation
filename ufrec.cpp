@@ -117,16 +117,13 @@ void recieveData(string port, unsigned char ** cipherText, int* cipherTextLen){
 
     bytesRead = 1;
     int totalBytesRead=0;
-    unsigned char buffer[totalBytes];
-    cout<< "Total Bytes:" << totalBytes<<"\n";
-    cout << "Printing recieved data \n";
+    *cipherText = (unsigned char *) malloc(totalBytes);
+    *cipherTextLen = totalBytes;
 
     while(bytesRead!=0){
-        bytesRead = recv(socket, buffer+totalBytesRead, totalBytes,0);
+        bytesRead = recv(socket, *cipherText+totalBytesRead, totalBytes,0);
         totalBytesRead = totalBytesRead + bytesRead;
     }
-    *cipherText = buffer;
-    *cipherTextLen = totalBytes;
     return;
 }
 
@@ -149,8 +146,6 @@ int main(int argc, char * argv[])
         
     }else{
         recieveData(port,&cipherText,&cipherTextLen);
-        cout<<"DATA:" << cipherText<<"\n";
-        cout<<"DATALEN:" << cipherTextLen<<"\n";
     }
 
 

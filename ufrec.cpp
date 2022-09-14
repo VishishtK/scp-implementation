@@ -2,49 +2,11 @@
 #include <fstream>
 #include <string.h>
 #include <openssl/evp.h>
-#include <openssl/sha.h>
-#include <openssl/ssl.h>
-#include <openssl/rsa.h>
-#include <openssl/x509.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include "utils.h"
 using namespace std;
-
-string getFilename(int argc, char * argv[]){
-    if (argc <2)
-    {
-        cout << "Filename missing\n";
-        exit(EXIT_FAILURE);
-    }
-    return argv[1];
-}
-
-string getRunningMode(int argc, char * argv[]){
-    if(argc<3){
-        // Default Mode
-        cout << "Default (Local) running mode\n";
-        return "local";
-    }else{
-            if(strcmp(argv[2],"-d")==0){
-                cout << "Remote running mode\n";
-                return "remote";
-            }else{
-                cout << "Local running mode\n";
-                return "local";
-            }
-        }
-}
-
-string getPort(int argc, char * argv[]){
-    if (argc<4)
-    {
-        cout << "Port missing for remote mode\n";
-        exit(EXIT_FAILURE);
-    }
-    cout << "Port:"<<argv[3]<<"\n";
-    return argv[3];
-}
 
 void decrypt(const unsigned char *cipherText, int len, unsigned char * key, unsigned char* IV,const EVP_CIPHER *aes256, unsigned char* decryptedText, int* decryptedTextLen){
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
@@ -58,56 +20,19 @@ void decrypt(const unsigned char *cipherText, int len, unsigned char * key, unsi
     }
 }
 
-string readFromFile(string filename){
-    ifstream myfile(filename);
-    if (!myfile.is_open())
-    {
-        cout << "Unable to open file " << filename << "\n"; 
-        exit(EXIT_FAILURE);
-    }
-    string fileInput((istreambuf_iterator<char>(myfile)),istreambuf_iterator<char>());
-    return fileInput;
-}
-
-int writeToFile(string filename, char* data, int dataLen){
-    string outputFileName = filename.substr(0,filename.length()-6);
-
-    ifstream myfile(outputFileName);
-    if (myfile.is_open())
-    {
-        cout << "Output file already exists, ABORTING " << outputFileName << "\n"; 
-        return 33;
-    }
-
-    ofstream out(outputFileName);
-    if(! out)
-    {  
-        cout<<"Cannot open output file\n";
-        exit(EXIT_FAILURE);
-    }
-    out.write(data,dataLen);
-    out.close();
-    return 1;
-}
 
 void recieveData(string port, unsigned char ** cipherText, int* cipherTextLen){
     int fd;
-
-    fd = socket(AF_INET,SOCK_STREAM,0);
-    cout<<fd<<"\n";
-
     struct sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(stoi(port));
     int address_length = sizeof(address);
 
+    fd = socket(AF_INET,SOCK_STREAM,0);
     bind(fd, (struct sockaddr*)&address,sizeof(address));
-
-    cout << listen(fd,3)<<"\n";
-
+    listen(fd,3);
     int socket = accept(fd,(struct sockaddr *)&address, (socklen_t*)&address_length);
-    cout<<socket<<"\n";
 
     int bytesRead = 0;
     int totalBytes;

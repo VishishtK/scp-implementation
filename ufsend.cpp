@@ -2,50 +2,13 @@
 #include <fstream>
 #include <string.h>
 #include <openssl/evp.h>
-#include <openssl/sha.h>
-#include <openssl/ssl.h>
-#include <openssl/rsa.h>
-#include <openssl/x509.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "utils.h"
+
 using namespace std;
-
-string getFilename(int argc, char * argv[]){
-    if (argc <2)
-    {
-        cout << "Filename missing\n";
-        exit(EXIT_FAILURE);
-    }
-    return argv[1];
-}
-
-string getRunningMode(int argc, char * argv[]){
-    if(argc<3){
-        // Default Mode
-        cout << "Default (Local) running mode\n";
-        return "local";
-    }else{
-            if(strcmp(argv[2],"-d")==0){
-                cout << "Remote running mode\n";
-                return "remote";
-            }else{
-                cout << "Local running mode\n";
-                return "local";
-            }
-        }
-}
-
-string getIPAddress(int argc, char * argv[]){
-    if (argc<4)
-    {
-        cout << "IP address missing for remote mode\n";
-        exit(EXIT_FAILURE);
-    }
-    cout << "IP:"<<argv[3]<<"\n";
-    return argv[3];
-}
 
 int encrypt(const unsigned char *plainText, int len, unsigned char * key, unsigned char* IV, const EVP_CIPHER *aes256, unsigned char* cipherText, int* cipherTextLen){
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
@@ -60,39 +23,6 @@ int encrypt(const unsigned char *plainText, int len, unsigned char * key, unsign
     }
 
     EVP_EncryptFinal_ex(ctx,cipherText+ *cipherTextLen,cipherTextLen);
-    return 1;
-}
-
-string readFromFile(string filename){
-    ifstream myfile(filename);
-    if (!myfile.is_open())
-    {
-        cout << "Unable to open file " << filename << "\n"; 
-        exit(EXIT_FAILURE);
-    }
-    string fileInput((istreambuf_iterator<char>(myfile)),istreambuf_iterator<char>());
-    return fileInput;
-}
-
-int writeToFile(string filename, char* data, int dataLen){
-    string fileExtension = ".ufsec";
-    string outputFileName = filename +fileExtension;
-
-    ifstream myfile(outputFileName);
-    if (myfile.is_open())
-    {
-        cout << "Output file already exists, ABORTING " << outputFileName << "\n"; 
-        return 33;
-    }
-
-    ofstream out(outputFileName);
-    if(! out)
-    {  
-        cout<<"Cannot open output file\n";
-        exit(EXIT_FAILURE);
-    }
-    out.write(data,dataLen);
-    out.close();
     return 1;
 }
 

@@ -2,9 +2,9 @@ CC = g++
 CPPFLAGS = -Wall -g -I/opt/homebrew/opt/openssl@3/include
 LDFLAGS= -L/opt/homebrew/opt/openssl@3/lib
 
-build: ufsend.o ufrec.o utils.o crypto.o
-	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufsend ufsend.o utils.o crypto.o -lcrypto
-	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufrec ufrec.o utils.o crypto.o -lcrypto
+build: ufsend.o ufrec.o utils.o crypto.o network.o
+	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufsend ufsend.o utils.o crypto.o network.o -lcrypto
+	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufrec ufrec.o utils.o crypto.o network.o -lcrypto
 
 ufsend.o: ufsend.cpp
 	$(CC) $(CPPFLAGS) -c ufsend.cpp
@@ -17,6 +17,9 @@ utils.o: utils.cpp
 
 crypto.o: crypto.cpp
 	$(CC) $(CPPFLAGS) -c crypto.cpp
+
+network.o: network.cpp
+	$(CC) $(CPPFLAGS) -c network.cpp
 
 clean: 
 	rm -f *.o

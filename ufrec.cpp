@@ -1,49 +1,11 @@
 #include <iostream>
-#include <fstream>
 #include <string.h>
-#include <openssl/evp.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <netinet/in.h>
 #include "utils.h"
 #include "crypto.h"
+#include "network.h"
 
 using namespace std;
 
-void recieveData(string port, unsigned char ** cipherText, int* cipherTextLen){
-    // Creating socket and starting to listen for connections
-    int fd;
-    struct sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(stoi(port));
-    int address_length = sizeof(address);
-
-    fd = socket(AF_INET,SOCK_STREAM,0);
-    bind(fd, (struct sockaddr*)&address,sizeof(address));
-    listen(fd,3);
-    int socket = accept(fd,(struct sockaddr *)&address, (socklen_t*)&address_length);
-
-    // Starting to read the bytes after accepting a connection
-    // First read the first 4 bytes which tells us how many bytes of encrypted
-    // data and IV we will recieve
-    int bytesRead = 0;
-    int totalBytes;
-    while(bytesRead<4){
-        bytesRead = bytesRead + read(socket, &totalBytes, 4);
-    }
-
-    // Read the IV and the encrypted data
-    int totalBytesRead=0;
-    *cipherText = (unsigned char *) malloc(totalBytes);
-    *cipherTextLen = totalBytes;
-
-    while(bytesRead!=0){
-        bytesRead = recv(socket, *cipherText+totalBytesRead, totalBytes,0);
-        totalBytesRead = totalBytesRead + bytesRead;
-    }
-    return;
-}
 
 int main(int argc, char * argv[]){
     //Parsing the command line inputs

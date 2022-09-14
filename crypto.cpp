@@ -1,5 +1,7 @@
 #include <openssl/evp.h>
 #include <iostream>
+#include <string.h>
+#include <openssl/rand.h>
 
 using namespace std;
 
@@ -29,4 +31,43 @@ void decrypt(const unsigned char *cipherText, int len, unsigned char * key, unsi
         cout<<"Decryption failed\n";
         exit(EXIT_FAILURE);
     }
+}
+
+void genKey(string password, unsigned char * key, const EVP_CIPHER *aes256){
+    const unsigned char salt[] = "SodiumChloride";
+    const int iterations = 4096;
+    const int keyLength = EVP_CIPHER_key_length(aes256);
+
+    if (PKCS5_PBKDF2_HMAC(password.c_str(),password.length(),salt,14,iterations,EVP_sha3_256(),keyLength,key)==0){
+        cout<< "Unable to generate key";
+        exit(EXIT_FAILURE);
+    }
+
+    cout << "KEY: ";
+    for(int i=0;i<keyLength;i++){
+        cout<<hex<<(int)key[i]<<" "<<dec;
+    }
+    cout << "\n";
+
+    return;
+}
+
+void genIV(unsigned char * iv,const EVP_CIPHER *aes256){
+
+    const int ivLength = EVP_CIPHER_iv_length(aes256);
+    int rc = RAND_bytes(iv,ivLength);
+
+    if(rc!=1){
+        cout << "IV gen failed \n";
+        exit(EXIT_FAILURE);
+    }
+
+    cout << "IV: ";
+    for(int i=0;i<ivLength;i++){
+        cout<<hex<<(int)iv[i]<<" "<<dec;
+    }
+    cout << "\n";
+
+    return;
+
 }

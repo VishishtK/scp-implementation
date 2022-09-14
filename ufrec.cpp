@@ -29,7 +29,6 @@ void recieveData(string port, unsigned char ** cipherText, int* cipherTextLen){
         bytesRead = bytesRead + read(socket, &totalBytes, 4);
     }
 
-    bytesRead = 1;
     int totalBytesRead=0;
     *cipherText = (unsigned char *) malloc(totalBytes);
     *cipherTextLen = totalBytes;
@@ -51,9 +50,8 @@ int main(int argc, char * argv[]){
 
     unsigned char* cipherText=NULL;
     int cipherTextLen;
-    string data;
     if(runningMode.compare("local")==0){
-        data = readFromFile(filename);
+        string data = readFromFile(filename);
         cipherText = (unsigned char*) data.c_str();
         cipherTextLen = data.length();
         
@@ -61,45 +59,31 @@ int main(int argc, char * argv[]){
         recieveData(port,&cipherText,&cipherTextLen);
     }
 
-
     string password;
     cout << "Password:";
     cin >> password;
-    cout << "\n";
 
-    const unsigned char salt[] = "SodiumChloride";
-    const int iterations = 4096;
     const EVP_CIPHER *aes256 = EVP_aes_256_gcm();
+
     const int keyLength = EVP_CIPHER_key_length(aes256);
-    unsigned char key[keyLength];
+    unsigned char* key = (unsigned char*) malloc(keyLength);
+    genKey(password, key, aes256);
+    
     const int ivLength = EVP_CIPHER_iv_length(aes256);
-    unsigned char iv[ivLength];
-
-
-    if (PKCS5_PBKDF2_HMAC(password.c_str(),password.length(),salt,14,iterations,EVP_sha3_256(),keyLength,key)==0){
-        cout<< "Unable to generate key";
-        exit(EXIT_FAILURE);
-    }
-    cout << "KEY: ";
-    for(int i=0;i<keyLength;i++){
-        cout<<hex<<(int)key[i]<<" "<<dec;
-    }
-    cout << "\n";
-
-    if (PKCS5_PBKDF2_HMAC((const char*)key,keyLength,salt,14,iterations,EVP_sha3_256(),ivLength,iv)==0){
-        cout<< "Unable to generate iv";
-        exit(EXIT_FAILURE);
-    }
+    unsigned char *iv = (unsigned char*)malloc(ivLength);
+    memcpy(iv,cipherText,ivLength);
     cout << "IV: ";
     for(int i=0;i<ivLength;i++){
         cout<<hex<<(int)iv[i]<<" "<<dec;
     }
     cout << "\n";
 
+    cipherText = cipherText+ivLength;
+    cipherTextLen = cipherTextLen - ivLength;
+
     unsigned char* decryptedText=(unsigned char*)malloc(cipherTextLen);
     int decryptedTextLen;
-
     decrypt((const unsigned char*)cipherText,cipherTextLen,key,iv,aes256,decryptedText,&decryptedTextLen);
-    cout<<decryptedText;
+    cout<<decryptedText<<"\n";
     return writeToFile(filename,(char *)decryptedText,decryptedTextLen);
 }

@@ -65,40 +65,22 @@ int main(int argc, char * argv[]){
     string password;
     cout << "Password:";
     cin >> password;
-    cout << "\n";
 
-    const unsigned char salt[] = "SodiumChloride";
-    const int iterations = 4096;
     const EVP_CIPHER *aes256 = EVP_aes_256_gcm();
+
     const int keyLength = EVP_CIPHER_key_length(aes256);
-    unsigned char key[keyLength];
+    unsigned char* key = (unsigned char*)malloc(keyLength);
+    genKey(password, key, aes256);
+
     const int ivLength = EVP_CIPHER_iv_length(aes256);
-    unsigned char iv[ivLength];
+    unsigned char *iv = (unsigned char*)malloc(ivLength);
+    genIV(iv,aes256);
 
+    unsigned char* cipherText=(unsigned char*)malloc(ivLength+plainTextLen);
+    memcpy(cipherText,iv,ivLength);
 
-    if (PKCS5_PBKDF2_HMAC(password.c_str(),password.length(),salt,14,iterations,EVP_sha3_256(),keyLength,key)==0){
-        cout<< "Unable to generate key";
-        exit(EXIT_FAILURE);
-    }
-    cout << "KEY: ";
-    for(int i=0;i<keyLength;i++){
-        cout<<hex<<(int)key[i]<<" "<<dec;
-    }
-    cout << "\n";
-
-    if (PKCS5_PBKDF2_HMAC((const char*)key,keyLength,salt,14,iterations,EVP_sha3_256(),ivLength,iv)==0){
-        cout<< "Unable to generate iv";
-        exit(EXIT_FAILURE);
-    }
-    cout << "IV: ";
-    for(int i=0;i<ivLength;i++){
-        cout<<hex<<(int)iv[i]<<" "<<dec;
-    }
-    cout << "\n";
-
-    unsigned char* cipherText=(unsigned char*)malloc(plainTextLen);
     int cipherTextLen;
-    if(encrypt(plainText,plainTextLen,key,iv,aes256,cipherText,&cipherTextLen)==0){
+    if(encrypt(plainText,plainTextLen,key,iv,aes256,cipherText+ivLength,&cipherTextLen)==0){
         return 0;
     }
     cout << "Successfully encrypted testfile ("<<(int)plainTextLen<<" bytes encrypted)\n";
@@ -109,7 +91,7 @@ int main(int argc, char * argv[]){
         }
         cout << "Successfully encrypted testfile to testfile.uf ("<<(int)plainTextLen<<" bytes written)\n";
     }else{
-        sendData(ipAddress,(unsigned char*)cipherText,plainTextLen);
+        sendData(ipAddress,(unsigned char*)cipherText,plainTextLen+ivLength);
         cout << "Successfully encrypted testfile and transmitted("<<(int)plainTextLen<<" bytes transmitted)\n";
     }
 

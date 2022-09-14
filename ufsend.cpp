@@ -65,8 +65,7 @@ void sendData(string ipAddress, unsigned char* cipherText, int cipherTextLen){
     return;
 }
 
-int main(int argc, char * argv[])
-{    
+int main(int argc, char * argv[]){
     string filename = getFilename(argc, argv);
     string runningMode = getRunningMode(argc, argv);
     string ipAddress;

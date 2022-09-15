@@ -1,6 +1,7 @@
 #include <openssl/evp.h>
 #include <iostream>
 #include <string.h>
+#include "utils.h"
 #include <openssl/rand.h>
 
 using namespace std;
@@ -44,10 +45,7 @@ void genKey(string password, unsigned char * key, const EVP_CIPHER *aes256){
     }
 
     cout << "KEY: ";
-    for(int i=0;i<keyLength;i++){
-        cout<<hex<<(int)key[i]<<" "<<dec;
-    }
-    cout << "\n";
+    printHex(key,keyLength);
 
     return;
 }
@@ -63,10 +61,7 @@ void genIV(unsigned char * iv,const EVP_CIPHER *aes256){
     }
 
     cout << "IV: ";
-    for(int i=0;i<ivLength;i++){
-        cout<<hex<<(int)iv[i]<<" "<<dec;
-    }
-    cout << "\n";
+    printHex(iv,ivLength);
 
     return;
 

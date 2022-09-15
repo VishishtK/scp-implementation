@@ -56,13 +56,18 @@ int main(int argc, char * argv[]){
     // After extracting the IV rest of the data is encrypted data
     cipherText = cipherText+ivLength;
     cipherTextLen = cipherTextLen - ivLength;
+    
+    // cout<< "Encrypted data received in Hex";
+    // printHex(cipherText,cipherTextLen);
 
     unsigned char* decryptedText=(unsigned char*)malloc(cipherTextLen);
     int decryptedTextLen;
     
     // Decrypting the ciphertext
     decrypt((const unsigned char*)cipherText,cipherTextLen,key,iv,aes256,decryptedText,&decryptedTextLen);
-    // cout<<decryptedText<<"\n";
-    // Writing the decrypted data to disk
-    return writeToFile(filename,(char *)decryptedText,decryptedTextLen);
+
+    cout<<"Decrypted Text:\n";
+    cout<<decryptedText<<"\n";
+    // Writing the decrypted data to disk by droping the last 6 chars ".ufsec" from the file name
+    return writeToFile(filename.substr(0,filename.length()-6),(char *)decryptedText,decryptedTextLen);
 }

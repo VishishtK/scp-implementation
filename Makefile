@@ -3,8 +3,8 @@ CPPFLAGS = -Wall -g -I/opt/homebrew/opt/openssl@3/include
 LDFLAGS= -L/opt/homebrew/opt/openssl@3/lib
 
 build: ufsend.o ufrec.o utils.o crypto.o network.o
-	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufsend ufsend.o utils.o crypto.o network.o -lcrypto
-	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufrec ufrec.o utils.o crypto.o network.o -lcrypto
+	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufsend ufsend.o crypto.o network.o utils.o -lcrypto
+	$(CC) $(CPPFLAGS) $(LDFLAGS) -o ufrec ufrec.o crypto.o network.o utils.o -lcrypto
 
 ufsend.o: ufsend.cpp
 	$(CC) $(CPPFLAGS) -c ufsend.cpp

@@ -50,19 +50,18 @@ int main(int argc, char * argv[]){
         return 0;
     }
     cout << "Successfully encrypted "<<filename <<"("<<plainTextLen<<" bytes encrypted)\n";
+    // cout<<"Encrypted file bytes :\n";
+    // for(int i=ivLength;i<ivLength+plainTextLen;i++){
+    //     cout<<hex<<(int)cipherText[i]<<" "<<dec;
+    // }
 
     if(runningMode.compare("local")==0){
-        if(writeToFile(filename,(char *)cipherText,plainTextLen)==33){
+        if(writeToFile(filename+".ufsec",(char *)cipherText,plainTextLen)==33){
             return 33;
         }
-        cout << "Successfully written to disk ("<<plainTextLen+ivLength<<" bytes written)\n";
+        cout << "Successfully written IV and CipherText to " <<filename+".ufsec " << "("<<plainTextLen+ivLength<<" bytes written)\n";
     }else{
         sendData(ipAddress,(unsigned char*)cipherText,plainTextLen+ivLength);
-        cout << "Successfully transmitted("<<plainTextLen+ivLength<<" bytes transmitted)\n";
+        cout << "Successfully transmitted IV and CipherText("<<plainTextLen+ivLength<<" bytes transmitted)\n";
     }
-
-    for(int i=0;i<10;i++){
-        cout<<hex<<(int)cipherText[i]<<" "<<dec;
-    }
-    cout << "(and all the rest...) \n";
 }

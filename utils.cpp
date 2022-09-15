@@ -60,9 +60,7 @@ string readFromFile(string filename){
     return fileInput;
 }
 
-int writeToFile(string filename, char* data, int dataLen){
-    string outputFileName = filename.substr(0,filename.length()-6);
-
+int writeToFile(string outputFileName, char* data, int dataLen){
     ifstream myfile(outputFileName);
     if (myfile.is_open())
     {
@@ -79,4 +77,11 @@ int writeToFile(string filename, char* data, int dataLen){
     out.write(data,dataLen);
     out.close();
     return 1;
+}
+
+void printHex(unsigned char* data, int dataLen){
+    for(int i=0;i<dataLen;i++){
+        cout<<hex<<(int)data[i]<<" "<<dec;
+    }
+    cout << "\n";
 }

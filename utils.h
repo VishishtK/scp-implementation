@@ -14,3 +14,5 @@ string getPort(int argc, char * argv[]);
 string readFromFile(string filename);
 
 int writeToFile(string filename, char* data, int dataLen);
+
+void printHex(unsigned char* data, int dataLen);

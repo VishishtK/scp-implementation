@@ -65,6 +65,7 @@ void recieveData(string port, unsigned char ** cipherText, int* cipherTextLen){
     // Starting to read the bytes after accepting a connection
     // First read the first 4 bytes which tells us how many bytes of encrypted
     // data and IV we will recieve
+    cout << "Receiving encrypted data \n";
     int bytesRead = 0;
     int totalBytes;
     while(bytesRead<4){

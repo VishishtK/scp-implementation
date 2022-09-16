@@ -56,7 +56,7 @@ int main(int argc, char * argv[]){
     // }
 
     if(runningMode.compare("local")==0){
-        if(writeToFile(filename+".ufsec",(char *)cipherText,plainTextLen)==33){
+        if(writeToFile(filename+".ufsec",(char *)cipherText,plainTextLen+ivLength)==33){
             return 33;
         }
         cout << "Successfully written IV and CipherText to " <<filename+".ufsec " << "("<<plainTextLen+ivLength<<" bytes written)\n";

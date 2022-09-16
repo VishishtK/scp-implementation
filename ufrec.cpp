@@ -21,10 +21,7 @@ int main(int argc, char * argv[]){
     unsigned char* cipherText=NULL;
     int cipherTextLen;
     if(runningMode.compare("local")==0){
-        string data = readFromFile(filename);
-        cipherText = (unsigned char*) data.c_str();
-        cipherTextLen = data.length();
-        
+        readFromFile(filename,&cipherText,&cipherTextLen);
     }else{
         recieveData(port,&cipherText,&cipherTextLen);
     }

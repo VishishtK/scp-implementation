@@ -9,7 +9,7 @@ string getIPAddress(int argc, char * argv[]);
 
 string getPort(int argc, char * argv[]);
 
-string readFromFile(string filename);
+void readFromFile(string filename, unsigned char** cipherText, int* cipherTextLen);
 
 int writeToFile(string filename, char* data, int dataLen);
 

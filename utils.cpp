@@ -49,7 +49,7 @@ string getPort(int argc, char * argv[]){
     return argv[3];
 }
 
-string readFromFile(string filename){
+void readFromFile(string filename, unsigned char** cipherText, int* cipherTextLen){
     ifstream myfile(filename);
     if (!myfile.is_open())
     {
@@ -57,7 +57,9 @@ string readFromFile(string filename){
         exit(EXIT_FAILURE);
     }
     string fileInput((istreambuf_iterator<char>(myfile)),istreambuf_iterator<char>());
-    return fileInput;
+    *cipherText = (unsigned char*)malloc(fileInput.length());
+    memcpy(*cipherText,fileInput.c_str(),fileInput.length());
+    *cipherTextLen = fileInput.length();
 }
 
 int writeToFile(string outputFileName, char* data, int dataLen){

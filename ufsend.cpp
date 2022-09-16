@@ -16,9 +16,10 @@ int main(int argc, char * argv[]){
     }
 
     // Reading data from the file which needs to be encrypted and stored/sent over the network
-    string data = readFromFile(filename);
-    const unsigned char* plainText = (const unsigned char*) data.c_str();
-    int plainTextLen = data.length();
+    unsigned char* plainText = NULL;
+    int plainTextLen;
+    readFromFile(filename,&plainText,&plainTextLen);
+    
 
     // Take password input
     string password;
